@@ -968,7 +968,7 @@ const EQUIPAMENTOS = [
   { id: 'painel',         nome: 'Painel Interativo',     icon: '🎮' },
   { id: 'pista_skate',    nome: 'Pista de Skate',        icon: '🛹' },
   { id: 'corda',          nome: 'Estrutura de Cordas',   icon: '🪢' },
-  { id: 'piso',           nome: 'Piso Absorvente',       icon: '🟫' },
+  { id: 'piso',           nome: 'Piso Absorvente',       icon: '🟫', obrigatorio: true },
 ];
 
 // ════════════════════════════════
@@ -1008,7 +1008,9 @@ const CHECKLIST = {
       {
         nome: 'Zona de queda', ref: 'NBR 16071-7 §4',
         itens: [
-          { ref: 'E-14', desc: 'Zona livre ao redor do equipamento conforme altura de queda livre (HQL)', dica: 'HQL (Altura de Queda Livre): é a maior distância vertical entre o ponto de acesso mais alto do equipamento e o piso. Ex: escorregador com plataforma a 1,5 m → HQL = 1,5 m. A zona livre (sem obstáculos) ao redor deve ser ≥ HQL + 1,5 m em todas as direções (mín. 1,5 m). Verifique visualmente se há muros, outros brinquedos ou mobiliário dentro dessa faixa.' },
+          { ref: 'E-14', desc: 'Zona livre ao redor do equipamento conforme HQL (Altura de Queda Livre)',
+            medida: { unidade: 'm', min: 1.0, max: null, dica: 'Registrar o MENOR afastamento medido. TABELA: HQL ate 0,6m->1,0m | HQL 0,6-1,0m->1,5m | HQL 1,0-2,0m->1,75m | HQL acima 2,0m->2,0m.' },
+            dica: 'HQL = altura do ponto de acesso mais alto. COMO MEDIR: trena da projecao vertical da extremidade mais saliente ate o obstaculo mais proximo em todas as direcoes. Registrar o MENOR valor. Ex: Escorregador HQL 1,5m -> zona livre minima 1,75m em todas as direcoes. Verificar muros, bancos e outros brinquedos dentro da faixa.' },
           { ref: 'E-15', desc: 'Piso absorvente adequado à altura de queda (HIC/HPC atendido)', dica: 'HIC (Head Injury Criterion) e HPC (Head Protection Criterion): indicam a capacidade do piso de absorver impacto e proteger a cabeça em caso de queda. Na prática: verifique se o piso absorvente (borracha, areia, grama sintética) cobre toda a zona de queda e consulte o certificado do fabricante do piso. Para borracha vulcanizada: espessura mínima varia de 40 mm (HQL ≤ 0,6 m) até 120 mm (HQL até 3 m). Meça a espessura com estilete ou sonda fina.' },
         ]
       },
@@ -1031,7 +1033,9 @@ const CHECKLIST = {
         itens: [
           { ref: 'B-05', desc: 'Correntes sem elos deformados, enferrujados ou com fissuras' },
           { ref: 'B-06', desc: 'Ganchos com trava de segurança eficaz (mola funcional)' },
-          { ref: 'B-07', desc: 'Ausência de frestas entre 8 mm e 25 mm nos elos e ganchos' },
+          { ref: 'B-07', desc: 'Ausência de frestas perigosas (entre 8mm e 25mm) nos elos e ganchos',
+            medida: { unidade: 'mm', min: 8, max: 25, logicaFaixa: true, dica: 'NC se fresta entre 8mm e 25mm. SEGURO: < 8mm ou > 25mm. Registrar o MAIOR valor medido.' },
+            dica: 'COMO MEDIR: paquimetro na abertura interna de cada elo e nos ganchos (com trava fechada). INTERPRETACAO: < 8mm = C | 8 a 25mm = NC (risco de aprisionamento do pescoco) | > 25mm = C. Verificar todos os elos e ganchos de fixacao.' },
           { ref: 'B-08', desc: 'Rolamentos/mancais sem ruído excessivo ou jogo axial' },
         ]
       },
@@ -1046,7 +1050,9 @@ const CHECKLIST = {
       {
         nome: 'Zona de queda', ref: 'NBR 16071-7 §4',
         itens: [
-          { ref: 'B-12', desc: 'Zona livre frontal e traseira = 2× o comprimento de suspensão + 1,75 m' },
+          { ref: 'B-12', desc: 'Zona livre frontal e traseira = 2x comprimento de suspensao + 1,75m',
+            medida: { unidade: 'm', min: 1.75, max: null, dica: 'Registrar o MENOR valor medido (frente ou atras). Formula: 2x comprimento correntes + 1,75m. Ex: correntes 2,0m -> zona 5,75m. Lateral: 0,5m alem dos montantes.' },
+            dica: 'COMO MEDIR: (1) Medir comprimento das correntes. (2) Calcular: 2x comprimento + 1,75m. (3) Medir da projecao do montante frontal ate o obstaculo mais proximo. Repetir atras. Registrar o MENOR valor.' },
           { ref: 'B-13', desc: 'Piso absorvente em toda a zona de queda do balanço' },
         ]
       },
@@ -1192,7 +1198,9 @@ const CHECKLIST = {
       {
         nome: 'Zona de queda geral', ref: 'NBR 16071-7',
         itens: [
-          { ref: 'EC-12', desc: 'Zona livre ao redor de toda a estrutura conforme HQL do ponto mais alto' },
+          { ref: 'EC-12', desc: 'Zona livre ao redor de toda a estrutura conforme HQL do ponto mais alto',
+            medida: { unidade: 'm', min: 1.0, max: null, dica: 'Registrar o MENOR afastamento. TABELA: HQL ate 0,6m->1,0m | HQL 0,6-1,0m->1,5m | HQL 1,0-2,0m->1,75m | HQL acima 2,0m->2,0m.' },
+            dica: 'HQL = altura do ponto mais alto da estrutura combinada. Medir da projecao vertical de qualquer extremidade (incluindo escorregadores salientes) ate obstaculos em todas as direcoes. Registrar o MENOR valor encontrado.' },
           { ref: 'EC-13', desc: 'Piso absorvente em toda a zona de queda, sem falhas ou deslocamentos' },
         ]
       },
@@ -1375,25 +1383,55 @@ const CHECKLIST = {
   piso: {
     grupos: [
       {
-        nome: 'Espessura e integridade', ref: 'NBR 16071-8',
+        nome: 'Documentação obrigatória', ref: 'NBR 16071-8',
         itens: [
-          { ref: 'PS-01', desc: 'Espessura do piso compatível com a Altura Crítica de Queda (HQL) do equipamento mais alto' },
-          { ref: 'PS-02', desc: 'Ausência de lacunas, remendos soltos, ondulações ou descolamentos' },
-          { ref: 'PS-03', desc: 'Sem exposição de substrato rígido por desgaste do material absorvente' },
+          { ref: 'PS-00', desc: 'Laudo/certificado do fabricante do piso disponível e apresentado no local',
+            autoNcObs: 'O responsável pelo local não apresentou o laudo/certificado do fabricante do piso absorvente, documento exigido pela ABNT NBR 16071-8 para comprovação da Altura Crítica de Queda (HQL) compatível com os equipamentos instalados. Na ausência deste documento, não é possível atestar conformidade do piso quanto à capacidade de atenuação de impacto. Recomenda-se: (1) solicitar ao fornecedor do piso o laudo técnico com a HQL certificada para a espessura instalada; (2) caso o documento não esteja disponível, contratar empresa especializada para ensaio de campo conforme ABNT NBR 16071-8; (3) interditar preventivamente a área até apresentação da documentação ou substituição do piso por produto certificado.',
+            dica: 'Solicitar ANTES da vistoria. O laudo do fabricante deve indicar a HQL (Altura Crítica de Queda) certificada para a espessura instalada. Ausência deste documento = NC automática em PS-00, PS-01 e PS-01B.' },
+        ]
+      },
+      {
+        nome: 'Espessura e HQL', ref: 'NBR 16071-8',
+        itens: [
+          { ref: 'PS-01', desc: 'HQL certificada (laudo fabricante) maior ou igual à HQL do equipamento mais alto',
+            medidaDupla: {
+              campoA: { label: 'HQL máx. do playground (m) — medir no local', unidade: 'm', placeholder: 'Ex: 1.5', key: 'hqlEquip' },
+              campoB: { label: 'HQL certificada no laudo do piso (m) — ler no documento', unidade: 'm', placeholder: 'Ex: 2.0', key: 'hqlLaudo' },
+              dica: 'Campo A: medir a altura da plataforma mais alta do playground (em metros). Campo B: ler no laudo do fabricante do piso. RESULTADO: se B >= A = Conforme. Se B < A = NC (piso subdimensionado). TABELA REF (borracha vulcanizada): 15mm->0,6m | 20mm->1,0m | 25mm->1,2m | 30mm->1,5m | 40mm->2,0m | 45mm->2,2m | 50mm->2,6m | 60mm->3,0m.'
+            },
+            dica: 'Compare os dois campos abaixo. Se a HQL do laudo do piso for MENOR que a HQL do equipamento mais alto, o piso é subdimensionado = NC. Sem laudo (PS-00 = NC): marcar NC e deixar campos em branco.' },
+          { ref: 'PS-01B', desc: 'Espessura medida em campo maior ou igual à espessura certificada pelo fabricante',
+            medida: { unidade: 'mm', min: 15, max: null, dica: 'Medir em 3 pontos: (1) centro da placa, (2) junta entre 2 placas, (3) area de maior trafego. Registrar o MENOR valor. Min. absoluto: 15mm para HQL 0,6m | 40mm para HQL 2,0m (padrao condominio). Para areia/material solto: profundidade minima 300mm.' },
+            dica: 'Medir com sonda fina ou paquimetro. Registrar o menor valor encontrado. Se menor que o valor certificado no laudo = NC (piso com desgaste excessivo). Sem laudo (PS-00 = NC): registrar a medida mas marcar NC.' },
+        ]
+      },
+      {
+        nome: 'Integridade da superfície', ref: 'NBR 16071-8',
+        itens: [
+          { ref: 'PS-02', desc: 'Ausência de lacunas, remendos soltos, ondulações ou descolamentos',
+            dica: 'Abertura entre placas > 8mm = risco de aprisionamento de dedos (NBR 16071-2). Remendos soltos ou ondulacoes comprometem a atenuacao de impacto.' },
+          { ref: 'PS-03', desc: 'Sem exposição de substrato rígido (concreto, saibro) por desgaste',
+            dica: 'Se o substrato aflorar em qualquer ponto da zona de queda, a protecao e NULA naquele local. NC imediata — interditar a area ate correcao.' },
+          { ref: 'PS-03A', desc: 'Superfície livre de pontas afiadas, projeções perigosas e objetos estranhos',
+            dica: 'Parafusos salientes, fragmentos de vidro, pedras ou objetos duros na superficie = risco imediato. Varrer visualmente toda a zona de queda de cada equipamento.' },
         ]
       },
       {
         nome: 'Área de cobertura', ref: 'NBR 16071-7 §4',
         itens: [
-          { ref: 'PS-04', desc: 'Piso absorvente cobrindo toda a zona de queda de cada equipamento' },
-          { ref: 'PS-05', desc: 'Faixa mínima ao redor dos equipamentos conforme HQL (ver tabela norma)' },
+          { ref: 'PS-04', desc: 'Piso absorvente cobre toda a zona de queda de cada equipamento',
+            dica: 'Para balancos: cobrir 2x comprimento de suspensao + 1,75m a frente e atras. Verificar se nao ha falhas de cobertura em nenhum ponto da zona de queda.' },
+          { ref: 'PS-05', desc: 'Faixa mínima de piso absorvente ao redor de cada equipamento (medir com trena)',
+            medida: { unidade: 'm', min: 1.0, max: null, dica: 'Registrar o MENOR afastamento medido. TABELA: HQL ate 0,6m -> 1,0m | HQL 0,6-1,0m -> 1,5m | HQL 1,0-2,0m -> 1,75m | HQL acima 2,0m -> 2,0m. BALANCOS: frontal/traseiro = 2x comprimento de suspensao + 1,75m; lateral = 0,5m alem da estrutura. GIRAGIRA: raio do equip + 2,0m em todas as direcoes.' },
+            dica: 'COMO MEDIR: posicione a trena na projecao vertical da extremidade do equipamento e mida ate a borda do piso absorvente. Fazer em todas as direcoes. EXEMPLOS PRATICOS — Escorregador altura 1,5m (HQL=1,5m): piso deve cobrir pelo menos 1,75m em volta de toda a estrutura. Balanco com correntes de 2,0m: piso frontal/traseiro deve cobrir 2x2,0 + 1,75 = 5,75m; lateral 0,5m alem do montante. Registrar o menor valor encontrado e indicar o equipamento referenciado.' },
         ]
       },
       {
-        nome: 'Manutenção', ref: 'NBR 16071-5',
+        nome: 'Manutenção e conservação', ref: 'NBR 16071-5',
         itens: [
           { ref: 'PS-06', desc: 'Piso livre de objetos estranhos, lixo, raízes aflorantes ou obstáculos rígidos' },
-          { ref: 'PS-07', desc: 'Nivelamento adequado, sem depressões ou acúmulo de água' },
+          { ref: 'PS-07', desc: 'Nivelamento adequado, sem depressões ou acúmulo de água',
+            dica: 'Depressoes > 20mm comprometem tracao e podem acumular agua (risco de escorregamento e deterioracao acelerada do piso).' },
         ]
       },
     ]
@@ -1452,7 +1490,7 @@ const equipQtd = {};
 
 function renderEquipSelector() {
   const el = document.getElementById('equip-selector');
-  el.innerHTML = EQUIPAMENTOS.map(eq => `
+  el.innerHTML = EQUIPAMENTOS.filter(eq => !eq.obrigatorio).map(eq => `
     <div class="equip-chip" id="chip-${eq.id}">
       <span class="equip-icon">${eq.icon}</span>
       <span class="equip-label">${eq.nome}</span>
@@ -1479,11 +1517,13 @@ function getEquipSelecionados() {
   // Retorna lista com instâncias: ['balanco_1','balanco_2','escorregador_1',...]
   const lista = [];
   EQUIPAMENTOS.forEach(eq => {
+    if (eq.obrigatorio) return;
     const n = equipQtd[eq.id] || 0;
     for (let i = 1; i <= n; i++) {
       lista.push(n === 1 ? eq.id : `${eq.id}_${i}`);
     }
   });
+  lista.push('piso'); // Piso Absorvente sempre presente, sempre último
   return lista;
 }
 
@@ -1534,7 +1574,10 @@ function iniciarChecklist() {
         grupos: cl.grupos.map(g => ({
           nome: g.nome, ref: g.ref,
           itens: g.itens.map(it => ({ ref: it.ref, desc: it.desc, status: '', obs: '',
-            medida: it.medida || null }))
+            medida: it.medida || null,
+            medidaDupla: it.medidaDupla || null,
+            hqlEquip: undefined, hqlLaudo: undefined,
+            autoNcObs: it.autoNcObs || null }))
         }))
       };
     }
@@ -1619,8 +1662,25 @@ function showEquip(idx) {
 
       <!-- Dados do equipamento -->
       <div style="margin-bottom:20px;">
-        <div class="item-group-title">Identificação do Equipamento</div>
+        <div class="item-group-title">${baseId === 'piso' ? 'Identificação do Piso Absorvente' : 'Identificação do Equipamento'}</div>
         <div class="equip-dados-grid">
+          ${baseId === 'piso' ? `
+          <div class="form-group">
+            <label>Fabricante / Marca do Piso</label>
+            <input type="text" value="${ch.dadosEquip.fabricante}" placeholder="Ex: Hug, Ecopex, Plastprime..."
+              oninput="state.checklist['${id}'].dadosEquip.fabricante=this.value">
+          </div>
+          <div class="form-group">
+            <label>Modelo / Código do Produto</label>
+            <input type="text" value="${ch.dadosEquip.modelo}" placeholder="Código/referência do piso"
+              oninput="state.checklist['${id}'].dadosEquip.modelo=this.value">
+          </div>
+          <div class="form-group">
+            <label>Ano instalação / Material</label>
+            <input type="text" value="${ch.dadosEquip.material}" placeholder="Ex: 2026 / Borracha vulcanizada"
+              oninput="state.checklist['${id}'].dadosEquip.material=this.value">
+          </div>
+          ` : `
           <div class="form-group">
             <label>Fabricante</label>
             <input type="text" value="${ch.dadosEquip.fabricante}" placeholder="Ex: Kompan, Hags..."
@@ -1636,6 +1696,7 @@ function showEquip(idx) {
             <input type="text" value="${ch.dadosEquip.material}" placeholder="Ex: 2018 / Polietileno"
               oninput="state.checklist['${id}'].dadosEquip.material=this.value">
           </div>
+          `}
         </div>
       </div>
 
@@ -1656,6 +1717,46 @@ function showEquip(idx) {
                     💡 O que verificar?
                   </button>
                   <div class="item-dica-box" id="dica-${id}-${gi}-${ii}">${it.dica}</div>
+                ` : ''}
+                ${it.medidaDupla ? `
+                  <div class="medida-wrap">
+                    <div class="medida-row" style="flex-wrap:wrap;gap:10px;align-items:flex-start;">
+                      <div style="display:flex;flex-direction:column;gap:4px;min-width:200px;flex:1">
+                        <span class="medida-label" style="font-size:11px;color:var(--muted)">${it.medidaDupla.campoA.label}</span>
+                        <div style="display:flex;align-items:center;gap:6px">
+                          <input type="number" class="medida-input" style="width:90px"
+                            id="medida-A-${id.replace(/[^a-z0-9]/g,'_')}_${gi}_${ii}"
+                            placeholder="${it.medidaDupla.campoA.placeholder}"
+                            value="${it.hqlEquip !== undefined ? it.hqlEquip : ''}"
+                            oninput="setHqlDupla('${id}',${gi},${ii},this.value,'A')"
+                            inputmode="decimal" step="0.1" min="0" autocomplete="off">
+                          <span class="medida-unit">${it.medidaDupla.campoA.unidade}</span>
+                        </div>
+                      </div>
+                      <div style="display:flex;flex-direction:column;gap:4px;min-width:200px;flex:1">
+                        <span class="medida-label" style="font-size:11px;color:var(--muted)">${it.medidaDupla.campoB.label}</span>
+                        <div style="display:flex;align-items:center;gap:6px">
+                          <input type="number" class="medida-input" style="width:90px"
+                            id="medida-B-${id.replace(/[^a-z0-9]/g,'_')}_${gi}_${ii}"
+                            placeholder="${it.medidaDupla.campoB.placeholder}"
+                            value="${it.hqlLaudo !== undefined ? it.hqlLaudo : ''}"
+                            oninput="setHqlDupla('${id}',${gi},${ii},this.value,'B')"
+                            inputmode="decimal" step="0.1" min="0" autocomplete="off">
+                          <span class="medida-unit">${it.medidaDupla.campoB.unidade}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="medida-result ${(it.hqlEquip && it.hqlLaudo) ? (parseFloat(it.hqlLaudo) >= parseFloat(it.hqlEquip) ? 'ok' : 'fail') : ''}"
+                      id="medida-dupla-result-${id.replace(/[^a-z0-9]/g,'_')}_${gi}_${ii}"
+                      style="${(it.hqlEquip && it.hqlLaudo) ? '' : 'display:none'}">
+                      ${(it.hqlEquip && it.hqlLaudo) ?
+                        (parseFloat(it.hqlLaudo) >= parseFloat(it.hqlEquip)
+                          ? '✓ Conforme — HQL laudo (' + it.hqlLaudo + 'm) >= HQL equipamento (' + it.hqlEquip + 'm)'
+                          : '✗ NC — HQL laudo (' + it.hqlLaudo + 'm) < HQL equipamento (' + it.hqlEquip + 'm) — piso subdimensionado!')
+                        : ''}
+                    </div>
+                    <div class="medida-hint" ${(it.hqlEquip && it.hqlLaudo) ? 'style="display:none"' : ''}>Ref: ${it.medidaDupla.dica}</div>
+                  </div>
                 ` : ''}
                 ${it.medida ? `
                   <div class="medida-wrap">
@@ -1759,7 +1860,41 @@ function showEquip(idx) {
 }
 
 function setStatus(id, gi, ii, status) {
-  state.checklist[id].grupos[gi].itens[ii].status = status;
+  const it = state.checklist[id].grupos[gi].itens[ii];
+  it.status = status;
+
+  // PS-00 = NC -> propagar NC para PS-01 e PS-01B + parecer automático
+  if (it.ref === 'PS-00' && id === 'piso') {
+    const ch = state.checklist[id];
+    const PARECER_SEM_LAUDO = 'O responsável pelo local não apresentou o laudo/certificado do fabricante do piso absorvente, documento exigido pela ABNT NBR 16071-8 para comprovação da Altura Crítica de Queda (HQL) compatível com os equipamentos instalados. Na ausência deste documento, não é possível atestar conformidade do piso quanto à capacidade de atenuação de impacto. Recomenda-se: (1) solicitar ao fornecedor do piso o laudo técnico com a HQL certificada para a espessura instalada; (2) caso o documento não esteja disponível, contratar empresa especializada para ensaio de campo conforme ABNT NBR 16071-8; (3) interditar preventivamente a área até apresentação da documentação ou substituição do piso por produto certificado.';
+    if (status === 'NC') {
+      // Propagar NC e obs para PS-01 e PS-01B (grupo 1, itens 0 e 1)
+      if (ch.grupos[1] && ch.grupos[1].itens[0]) {
+        ch.grupos[1].itens[0].status = 'NC';
+        ch.grupos[1].itens[0].obs = 'Laudo do fabricante não apresentado (ver PS-00). Impossível verificar HQL certificada.';
+      }
+      if (ch.grupos[1] && ch.grupos[1].itens[1]) {
+        ch.grupos[1].itens[1].status = 'NC';
+        ch.grupos[1].itens[1].obs = 'Laudo do fabricante não apresentado (ver PS-00). Impossível confirmar conformidade da espessura.';
+      }
+      // Preencher parecer automático se estiver vazio
+      if (!ch.parecer) ch.parecer = PARECER_SEM_LAUDO;
+    } else if (status === 'C') {
+      // Limpar NC e obs propagados de PS-01/01B se ainda forem os automáticos
+      if (ch.grupos[1] && ch.grupos[1].itens[0] && ch.grupos[1].itens[0].obs && ch.grupos[1].itens[0].obs.startsWith('Laudo do fabricante não apresentado')) {
+        ch.grupos[1].itens[0].status = '';
+        ch.grupos[1].itens[0].obs = '';
+      }
+      if (ch.grupos[1] && ch.grupos[1].itens[1] && ch.grupos[1].itens[1].obs && ch.grupos[1].itens[1].obs.startsWith('Laudo do fabricante não apresentado')) {
+        ch.grupos[1].itens[1].status = '';
+        ch.grupos[1].itens[1].obs = '';
+      }
+      if (ch.parecer && ch.parecer.startsWith('O responsável pelo local não apresentou')) {
+        ch.parecer = '';
+      }
+    }
+  }
+
   renderSidebar();
   showEquip(state.equipAtual);
 }
@@ -1790,9 +1925,82 @@ function setObs(id, gi, ii, val) {
   state.checklist[id].grupos[gi].itens[ii].obs = val;
 }
 
+function setHqlDupla(id, gi, ii, val, campo) {
+  const it = state.checklist[id].grupos[gi].itens[ii];
+  if (campo === 'A') it.hqlEquip = val;
+  else it.hqlLaudo = val;
+
+  const resultId = 'medida-dupla-result-' + id.replace(/[^a-z0-9]/g,'_') + '_' + gi + '_' + ii;
+  const resultEl = document.getElementById(resultId);
+  const hintEl = resultEl ? resultEl.nextElementSibling : null;
+
+  if (it.hqlEquip && it.hqlLaudo) {
+    const eqVal = parseFloat(it.hqlEquip);
+    const laudoVal = parseFloat(it.hqlLaudo);
+    const ok = !isNaN(eqVal) && !isNaN(laudoVal) && laudoVal >= eqVal;
+    if (resultEl) {
+      resultEl.className = 'medida-result ' + (ok ? 'ok' : 'fail');
+      resultEl.textContent = ok
+        ? '✓ Conforme — HQL laudo (' + it.hqlLaudo + 'm) >= HQL equipamento (' + it.hqlEquip + 'm)'
+        : '✗ NC — HQL laudo (' + it.hqlLaudo + 'm) < HQL equipamento (' + it.hqlEquip + 'm) — piso subdimensionado!';
+      resultEl.style.display = 'block';
+      if (hintEl && hintEl.classList.contains('medida-hint')) hintEl.style.display = 'none';
+    }
+    it.status = ok ? 'C' : 'NC';
+    renderSidebar();
+    const itemEl = document.getElementById('item-' + id + '-' + gi + '-' + ii);
+    if (itemEl) {
+      itemEl.className = 'checklist-item status-' + it.status;
+      itemEl.querySelectorAll('.status-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.classList.contains(it.status));
+      });
+    }
+  } else {
+    if (resultEl) resultEl.style.display = 'none';
+  }
+}
+
+function getEspMinByHql(hqlM) {
+  if (!hqlM || isNaN(parseFloat(hqlM))) return 15;
+  const h = parseFloat(hqlM);
+  if (h <= 0.6) return 15;
+  if (h <= 1.0) return 20;
+  if (h <= 1.2) return 25;
+  if (h <= 1.5) return 30;
+  if (h <= 2.0) return 40;
+  if (h <= 2.2) return 45;
+  if (h <= 2.6) return 50;
+  return 60;
+}
+
+function getAfastMinByHql(hqlM) {
+  if (!hqlM || isNaN(parseFloat(hqlM))) return 1.0;
+  const h = parseFloat(hqlM);
+  if (h <= 0.6) return 1.0;
+  if (h <= 1.0) return 1.5;
+  if (h <= 2.0) return 1.75;
+  return 2.0;
+}
+
 function setMedida(id, gi, ii, val, inputEl) {
   state.checklist[id].grupos[gi].itens[ii].valorMedido = val;
   const it = state.checklist[id].grupos[gi].itens[ii];
+
+  if (it.ref === 'PS-01B' && id === 'piso') {
+    const ps01 = state.checklist[id].grupos[1]?.itens[0];
+    const hqlEquip = ps01?.hqlEquip;
+    const espMin = getEspMinByHql(hqlEquip);
+    it.medida = { ...it.medida, min: espMin,
+      dica: 'Medir em 3 pontos. Registrar o MENOR valor. HQL=' + (hqlEquip||'?') + 'm -> minimo NBR: ' + espMin + 'mm.' };
+  }
+
+  if (it.ref === 'PS-05' && id === 'piso') {
+    const ps01 = state.checklist[id].grupos[1]?.itens[0];
+    const hqlEquip = ps01?.hqlEquip;
+    const afastMin = getAfastMinByHql(hqlEquip);
+    it.medida = { ...it.medida, min: afastMin,
+      dica: 'Registrar MENOR afastamento. HQL=' + (hqlEquip||'?') + 'm -> minimo: ' + afastMin + 'm. Balancos: 2x suspensao + 1,75m. Lateral: 0,5m. Giragira: raio + 2,0m.' };
+  }
 
   // Atualizar resultado inline SEM re-renderizar a tela
   // (evita fechar o teclado no tablet)
@@ -1828,6 +2036,10 @@ function validarMedida(val, medida) {
   if (val === '' || val === undefined) return true;
   const n = parseFloat(val);
   if (isNaN(n)) return true;
+  if (medida.logicaFaixa) {
+    const dentroFaixa = (medida.min !== null && n >= medida.min) && (medida.max !== null && n <= medida.max);
+    return !dentroFaixa;
+  }
   if (medida.min !== null && n < medida.min) return false;
   if (medida.max !== null && n > medida.max) return false;
   return true;
@@ -2202,15 +2414,24 @@ async function gerarPDF() {
     // Parecer técnico do equipamento
     if (ch.parecer) {
       checkY(18);
-      const parLines = doc.splitTextToSize(ch.parecer.replace(/[^\x00-\xFF]/g,'?'), contentW-6);
-      const parH = 10 + parLines.length*4;
-      doc.setFillColor(251,246,233); doc.rect(M, y, contentW, parH, 'F');
-      doc.setFillColor(...gold); doc.rect(M, y, 2, parH, 'F');
-      doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(...graphite);
-      doc.text('PARECER T\u00c9CNICO', M+4, y+5);
-      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...graphite);
-      doc.text(parLines, M+4, y+10);
-      y += parH + 4;
+      // Parecer: M=18, contentW=174, barraGold=3px, padH=6px
+      // Texto começa em x = M+3+6 = 27; margem direita = W-M = 192
+      // Largura disponivel para texto = 192 - 27 = 165mm
+      const parTextW = contentW - 3 - 12; // 174 - 15 = 159 (margem de segurança)
+      const parText = ch.parecer.replace(/[^\x00-\xFF]/g,'?');
+      doc.setFontSize(8.5);
+      const parLines = doc.splitTextToSize(parText, parTextW);
+      const parH = 14 + parLines.length * 4.8;
+      checkY(parH + 6);
+      doc.setFillColor(251, 246, 233);
+      doc.rect(M, y, contentW, parH, 'F');
+      doc.setFillColor(...gold);
+      doc.rect(M, y, 3, parH, 'F');
+      doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(...muted);
+      doc.text('PARECER T\u00c9CNICO', M + 9, y + 5.5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...graphite);
+      doc.text(parLines, M + 9, y + 11);
+      y += parH + 6;
     }
 
     // Fotos — uma por linha, página nova se não couber
