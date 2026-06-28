@@ -401,9 +401,9 @@ body {
 .medida-wrap {
   margin-top: 7px;
   padding: 7px 10px;
-  background: var(--blue-bg);
+  background: var(--gold-pale);
   border-radius: 5px;
-  border: 1px solid #BFDBFE;
+  border: 1px solid var(--gold-light);
 }
 .medida-row {
   display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
@@ -411,7 +411,7 @@ body {
 .medida-label { font-size: 11px; color: var(--graphite-mid); font-weight: 500; }
 .medida-input {
   width: 80px; padding: 4px 8px;
-  border: 1px solid #93C5FD; border-radius: 4px;
+  border: 1px solid var(--gold); border-radius: 4px;
   font-size: 13px; font-family: 'JetBrains Mono', monospace;
   font-weight: 600; color: var(--graphite);
   outline: none; background: white;
@@ -425,6 +425,28 @@ body {
 .medida-result.ok { color: var(--green); background: var(--green-bg); }
 .medida-result.fail { color: var(--red); background: var(--red-bg); }
 .medida-hint { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.item-dica-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 11px; color: var(--muted);
+  padding: 2px 6px; border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-top: 5px; transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.item-dica-btn:hover { background: var(--gold-pale); border-color: var(--gold); color: var(--gold); }
+.item-dica-box {
+  display: none;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-left: 3px solid var(--yellow);
+  border-radius: 5px;
+  font-size: 11.5px;
+  color: var(--graphite-mid);
+  line-height: 1.55;
+}
+.item-dica-box.open { display: block; }
 .item-obs {
   width: 100%;
   margin-top: 6px;
@@ -836,7 +858,8 @@ body {
           <div class="form-group">
             <label>Condição climática</label>
             <select id="i_clima">
-              <option>Tempo bom / Ensolarado</option>
+              <option>Ensolarado</option>
+              <option>Parcialmente nublado</option>
               <option>Nublado</option>
               <option>Chuvoso</option>
               <option>Após chuva</option>
@@ -982,8 +1005,8 @@ const CHECKLIST = {
       {
         nome: 'Zona de queda', ref: 'NBR 16071-7 §4',
         itens: [
-          { ref: 'E-14', desc: 'Zona livre ao redor do equipamento conforme altura de queda livre (HQL)' },
-          { ref: 'E-15', desc: 'Piso absorvente adequado à altura de queda (HIC/HPC atendido)' },
+          { ref: 'E-14', desc: 'Zona livre ao redor do equipamento conforme altura de queda livre (HQL)', dica: 'HQL (Altura de Queda Livre): é a maior distância vertical entre o ponto de acesso mais alto do equipamento e o piso. Ex: escorregador com plataforma a 1,5 m → HQL = 1,5 m. A zona livre (sem obstáculos) ao redor deve ser ≥ HQL + 1,5 m em todas as direções (mín. 1,5 m). Verifique visualmente se há muros, outros brinquedos ou mobiliário dentro dessa faixa.' },
+          { ref: 'E-15', desc: 'Piso absorvente adequado à altura de queda (HIC/HPC atendido)', dica: 'HIC (Head Injury Criterion) e HPC (Head Protection Criterion): indicam a capacidade do piso de absorver impacto e proteger a cabeça em caso de queda. Na prática: verifique se o piso absorvente (borracha, areia, grama sintética) cobre toda a zona de queda e consulte o certificado do fabricante do piso. Para borracha vulcanizada: espessura mínima varia de 40 mm (HQL ≤ 0,6 m) até 120 mm (HQL até 3 m). Meça a espessura com estilete ou sonda fina.' },
         ]
       },
     ]
@@ -1410,7 +1433,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
   document.getElementById('i_data').value = now.toISOString().split('T')[0];
   document.getElementById('i_hora').value = now.toTimeString().slice(0,5);
-  document.getElementById('header-date').textContent = now.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  const dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  document.getElementById('header-date').textContent =
+    dias[now.getDay()] + '. ' + String(now.getDate()).padStart(2,'0') + '.' +
+    String(now.getMonth()+1).padStart(2,'0') + '.' + now.getFullYear();
 
   // Número do laudo automático (ano + sequencial)
   document.getElementById('i_num_laudo').value = `${now.getFullYear()}${String(Math.floor(Math.random()*9000)+1000)}`;
@@ -1622,23 +1648,35 @@ function showEquip(idx) {
               <div class="item-left">
                 <div class="item-ref">${it.ref}</div>
                 <div class="item-desc">${it.desc}</div>
+                ${it.dica ? `
+                  <button class="item-dica-btn" onclick="toggleDica('dica-${id}-${gi}-${ii}')">
+                    💡 O que verificar?
+                  </button>
+                  <div class="item-dica-box" id="dica-${id}-${gi}-${ii}">${it.dica}</div>
+                ` : ''}
                 ${it.medida ? `
                   <div class="medida-wrap">
                     <div class="medida-row">
                       <span class="medida-label">📐 Medido em campo (${it.medida.unidade}):</span>
-                      <input type="number" class="medida-input" placeholder="0"
-                        value="${it.valorMedido || ''}"
-                        oninput="setMedida('${id}',${gi},${ii},this.value)"
-                        step="0.5" min="0">
+                      <input type="number" class="medida-input"
+                        id="medida-input-${id.replace(/[^a-z0-9]/g,'_')}_${gi}_${ii}"
+                        placeholder="0"
+                        value="${it.valorMedido !== undefined ? it.valorMedido : ''}"
+                        oninput="setMedida('${id}',${gi},${ii},this.value,this)"
+                        inputmode="decimal"
+                        step="1" min="0" autocomplete="off">
                       <span class="medida-unit">${it.medida.unidade}</span>
                     </div>
-                    ${it.valorMedido !== undefined && it.valorMedido !== '' ? `
-                      <div class="medida-result ${validarMedida(it.valorMedido, it.medida) ? 'ok' : 'fail'}">
-                        ${validarMedida(it.valorMedido, it.medida)
+                    <div class="medida-result ${it.valorMedido !== undefined && it.valorMedido !== '' ? (validarMedida(it.valorMedido, it.medida) ? 'ok' : 'fail') : ''}"
+                      id="medida-result-${id.replace(/[^a-z0-9]/g,'_')}_${gi}_${ii}"
+                      style="${it.valorMedido !== undefined && it.valorMedido !== '' ? '' : 'display:none'}">
+                      ${it.valorMedido !== undefined && it.valorMedido !== '' ?
+                        (validarMedida(it.valorMedido, it.medida)
                           ? '✓ Dentro do limite (' + it.medida.dica + ')'
-                          : '✗ Fora do limite! ' + it.medida.dica}
-                      </div>
-                    ` : `<div class="medida-hint">Ref: ${it.medida.dica}</div>`}
+                          : '✗ Fora do limite! ' + it.medida.dica)
+                        : ''}
+                    </div>
+                    <div class="medida-hint" ${it.valorMedido !== undefined && it.valorMedido !== '' ? 'style="display:none"' : ''}>Ref: ${it.medida.dica}</div>
                   </div>
                 ` : ''}
                 ${it.status === 'NC' ? `
@@ -1723,22 +1761,47 @@ function setStatus(id, gi, ii, status) {
   showEquip(state.equipAtual);
 }
 
+function toggleDica(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
 function setObs(id, gi, ii, val) {
   state.checklist[id].grupos[gi].itens[ii].obs = val;
 }
 
-function setMedida(id, gi, ii, val) {
+function setMedida(id, gi, ii, val, inputEl) {
   state.checklist[id].grupos[gi].itens[ii].valorMedido = val;
-  // Auto-sugestão de status baseada na medida
   const it = state.checklist[id].grupos[gi].itens[ii];
-  if (val !== '' && it.medida) {
+
+  // Atualizar resultado inline SEM re-renderizar a tela
+  // (evita fechar o teclado no tablet)
+  const resultId = 'medida-result-' + id.replace(/[^a-z0-9]/g,'_') + '_' + gi + '_' + ii;
+  const resultEl = document.getElementById(resultId);
+  if (resultEl && val !== '' && it.medida) {
     const ok = validarMedida(val, it.medida);
+    resultEl.className = 'medida-result ' + (ok ? 'ok' : 'fail');
+    resultEl.textContent = ok
+      ? '✓ Dentro do limite (' + it.medida.dica + ')'
+      : '✗ Fora do limite! ' + it.medida.dica;
+    resultEl.style.display = 'block';
+    // Atualizar status e sidebar sem re-render do checklist
     if (it.status === '' || it.status === 'C' || it.status === 'NC') {
       it.status = ok ? 'C' : 'NC';
       renderSidebar();
+      // Atualizar visual do item pai sem re-render total
+      const itemEl = document.getElementById('item-' + id + '-' + gi + '-' + ii);
+      if (itemEl) {
+        itemEl.className = 'checklist-item status-' + it.status;
+        // Atualizar botões C/NC/NA
+        itemEl.querySelectorAll('.status-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.classList.contains(it.status));
+        });
+      }
     }
+  } else if (resultEl && val === '') {
+    resultEl.style.display = 'none';
   }
-  showEquip(state.equipAtual);
 }
 
 function validarMedida(val, medida) {
@@ -2169,7 +2232,7 @@ async function gerarPDF() {
   });
 
   const nEquip = state.equipSelecionados.length;
-  const conclusaoText = 'Em ' + formatDate(d.data) + ', foi realizada inspe\u00e7\u00e3o t\u00e9cnica das condi\u00e7\u00f5es de seguran\u00e7a dos equipamentos de playground instalados em "' + d.contratante + '", localizado em ' + d.endereco + ', ' + d.cidade + '. A inspe\u00e7\u00e3o foi realizada de acordo com as disposi\u00e7\u00f5es da ABNT NBR 16071 (Partes 1 a 8) e ABNT NBR 14350, abrangendo ' + nEquip + ' equipamento' + (nEquip!==1?'s':'') + ' e ' + totalItems + ' item' + (totalItems!==1?'ns':'') + ' de verifica\u00e7\u00e3o. Foram identificados ' + tC + ' item' + (tC!==1?'ns':'') + ' conforme' + (tC!==1?'s':'') + ', ' + tNC + ' n\u00e3o conformidade' + (tNC!==1?'s':'') + ' e ' + tNA + ' item' + (tNA!==1?'ns':'') + ' n\u00e3o aplic\u00e1vel' + (tNA!==1?'eis':'') + '. O resultado geral da inspe\u00e7\u00e3o \u00e9: ' + resultadoGeral + '.';
+  const conclusaoText = 'Em ' + formatDate(d.data) + ', foi realizada inspe\u00e7\u00e3o t\u00e9cnica das condi\u00e7\u00f5es de seguran\u00e7a dos equipamentos de playground instalados em "' + d.contratante + '", localizado em ' + d.endereco + ', ' + d.cidade + '. A inspe\u00e7\u00e3o foi realizada de acordo com as disposi\u00e7\u00f5es da ABNT NBR 16071 (Partes 1 a 8) e ABNT NBR 14350, abrangendo ' + nEquip + ' equipamento' + (nEquip!==1?'s':'') + ' e ' + totalItems + (totalItems!==1?' itens':' item') + ' de verifica\u00e7\u00e3o. Foram identificados ' + tC + (tC!==1?' itens conformes':' item conforme') + ', ' + tNC + ' n\u00e3o conformidade' + (tNC!==1?'s':'') + ' e ' + tNA + (tNA!==1?' itens n\u00e3o aplic\u00e1veis':' item n\u00e3o aplic\u00e1vel') + '. O resultado geral da inspe\u00e7\u00e3o \u00e9: ' + resultadoGeral + '.';
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...graphite);
   const cLines = doc.splitTextToSize(conclusaoText, contentW);
   checkY(cLines.length*4.5 + 10);
