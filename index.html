@@ -15,9 +15,9 @@
   --graphite: #1C2333;
   --graphite-mid: #374151;
   --muted: #6B7280;
-  --border: #E5E7EB;
-  --border-strong: #D1D5DB;
-  --bg: #F7F8FA;
+  --border: #E4E4E4;
+  --border-strong: #D0D0D0;
+  --bg: #F5F5F5;
   --white: #FFFFFF;
   --green: #16A34A;
   --green-bg: #F0FDF4;
@@ -289,6 +289,7 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  background: var(--white);
 }
 
 .checklist-header {
@@ -308,7 +309,7 @@ body {
 .checklist-header .equip-title h2 { font-size: 17px; font-weight: 600; }
 .checklist-header .equip-title .equip-icon-lg { font-size: 26px; }
 
-.checklist-content { padding: 20px 24px; flex: 1; }
+.checklist-content { padding: 20px 24px; flex: 1; background: var(--white); }
 
 /* dados do equipamento */
 .equip-dados-grid {
@@ -319,28 +320,29 @@ body {
 }
 
 /* grupos de itens */
-.item-group { margin-bottom: 20px; }
+.item-group { margin-bottom: 20px; background: var(--white); }
 .item-group-title {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--graphite-mid);
-  padding-bottom: 8px;
+  padding: 8px 0;
   border-bottom: 2px solid var(--gold);
   margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
+  background: transparent;
 }
 .item-group-title .group-ref {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
-  background: var(--bg);
+  background: #ECECEC;
   padding: 2px 6px;
   border-radius: 4px;
   color: var(--muted);
-  border: 1px solid var(--border);
+  border: 1px solid #DADADA;
 }
 
 .checklist-item {
@@ -792,7 +794,8 @@ body {
           </div>
           <div class="form-group">
             <label>CNPJ / CPF</label>
-            <input type="text" id="i_cnpj" placeholder="00.000.000/0001-00">
+            <input type="text" id="i_cnpj" placeholder="00.000.000/0001-00 ou 000.000.000-00"
+              oninput="formatarCnpjCpf(this)" maxlength="18" inputmode="numeric">
           </div>
           <div class="form-group">
             <label>Responsável / Síndico</label>
@@ -1761,6 +1764,23 @@ function setStatus(id, gi, ii, status) {
   showEquip(state.equipAtual);
 }
 
+function formatarCnpjCpf(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 14);
+  if (v.length <= 11) {
+    // CPF: 000.000.000-00
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  } else {
+    // CNPJ: 00.000.000/0001-00
+    v = v.replace(/(\d{2})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1/$2');
+    v = v.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  }
+  el.value = v;
+}
+
 function toggleDica(id) {
   const el = document.getElementById(id);
   if (el) el.classList.toggle('open');
@@ -1937,8 +1957,8 @@ async function gerarPDF() {
   let y = 0;
 
   const gold = [201, 168, 76];
-  const graphite = [28, 35, 51];
-  const muted = [107, 114, 128];
+  const graphite = [40, 40, 40]; // preto neutro puro
+  const muted = [120, 120, 120]; // cinza neutro puro, sem tom azul
   const green = [22, 163, 74];
   const red = [220, 38, 38];
   const yellow = [217, 119, 6];
@@ -2125,9 +2145,10 @@ async function gerarPDF() {
     ch.grupos.forEach(g => {
       checkY(14);
       doc.setFillColor(247,248,250); doc.rect(M, y, contentW, 6, 'F');
-      doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(...muted);
-      doc.text(g.nome.toUpperCase(), M+2, y+4);
-      doc.setFont('courier','normal'); doc.setFontSize(6.5);
+      doc.setFillColor(...gold); doc.rect(M, y, 2, 6, 'F');
+      doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(...graphite);
+      doc.text(g.nome.toUpperCase(), M+5, y+4);
+      doc.setFont('courier','normal'); doc.setFontSize(6.5); doc.setTextColor(...muted);
       doc.text(g.ref, W-M-2, y+4, {align:'right'});
       y += 9;
 
@@ -2192,29 +2213,31 @@ async function gerarPDF() {
       y += parH + 4;
     }
 
-    // Fotos (máx 4 por equipamento, 2 por linha)
-    const fotos = ch.fotos.slice(0, 4);
+    // Fotos — uma por linha, página nova se não couber
+    const fotos = ch.fotos.slice(0, 6);
     if (fotos.length) {
-      checkY(55);
+      // Título "REGISTROS FOTOGRÁFICOS" — nova página se não couber
+      checkY(14);
       doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(...muted);
-      doc.text('REGISTROS FOTOGR\u00c1FICOS', M, y); y += 4;
-      const cols = Math.min(fotos.length, 2);
-      const thumbW = (contentW - (cols-1)*4) / cols;
-      const thumbH = thumbW * 0.65;
+      doc.text('REGISTROS FOTOGR\u00c1FICOS', M, y); y += 5;
+
+      // Cada foto ocupa largura total, altura proporcional (~55% da largura)
+      const fotoW = contentW;
+      const fotoH = Math.round(fotoW * 0.58); // ~56% aspect ratio paisagem
+
       fotos.forEach((f, fi) => {
-        const col = fi % 2, row = Math.floor(fi/2);
-        const fx = M + col*(thumbW+4);
-        const fy = y + row*(thumbH+4);
+        // Sempre nova página se a foto não couber completamente
+        if (y + fotoH > 268) addPage();
         try {
           const fmt = f.data.includes('data:image/png') ? 'PNG' : 'JPEG';
-          doc.addImage(f.data, fmt, fx, fy, thumbW, thumbH);
+          doc.addImage(f.data, fmt, M, y, fotoW, fotoH);
         } catch(e) {
-          doc.setFillColor(...borderGray); doc.rect(fx, fy, thumbW, thumbH, 'F');
-          doc.setFontSize(7); doc.setTextColor(...muted);
-          doc.text('Foto ' + (fi+1), fx+thumbW/2, fy+thumbH/2, {align:'center'});
+          doc.setFillColor(...borderGray); doc.rect(M, y, fotoW, fotoH, 'F');
+          doc.setFontSize(10); doc.setTextColor(...muted);
+          doc.text('Foto ' + (fi+1) + ' (erro ao carregar)', M + fotoW/2, y + fotoH/2, {align:'center'});
         }
+        y += fotoH + 5;
       });
-      y += Math.ceil(fotos.length/2)*(thumbH+4) + 4;
     }
   });
 
@@ -2278,7 +2301,16 @@ async function gerarPDF() {
   doc.text('Dacanal Engenharia  \u00b7  Solu\u00e7\u00f5es T\u00e9cnicas', M, y);
 
   const safeName = d.contratante.replace(/[^a-zA-Z0-9\s]/g,'').replace(/\s+/g,'_').slice(0,30);
-  doc.save('Laudo_NBR16071_' + d.numLaudo + '_' + safeName + '.pdf');
+  const fileName = 'Laudo_NBR16071_' + d.numLaudo + '_' + safeName + '.pdf';
+  // Forçar download direto sem abrir inline no browser
+  const pdfBlob = doc.output('blob');
+  const blobUrl = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(blobUrl); }, 1000);
   showToast('\u2713 Laudo gerado com sucesso!');
 }
 
