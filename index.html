@@ -834,6 +834,10 @@ body {
             <label>Nº do Laudo</label>
             <input type="text" id="i_num_laudo" placeholder="Ex: 9536">
           </div>
+          <div class="form-group span-2">
+            <label>Nº da ART — CREA-SP</label>
+            <input type="text" id="i_art" placeholder="Ex: 2026000000000" inputmode="numeric" maxlength="20">
+          </div>
           <div class="form-group">
             <label>Tipo de Piso</label>
             <select id="i_piso">
@@ -1554,6 +1558,7 @@ function iniciarChecklist() {
     data: document.getElementById('i_data').value,
     hora: document.getElementById('i_hora').value,
     numLaudo: document.getElementById('i_num_laudo').value,
+    art: document.getElementById('i_art').value,
     piso: document.getElementById('i_piso').value,
     tipo: document.getElementById('i_tipo').value,
     clima: document.getElementById('i_clima').value,
@@ -2185,7 +2190,8 @@ async function gerarPDF() {
   function rodape(pageNum) {
     doc.setFontSize(7.5); doc.setTextColor(...muted);
     doc.setFont('helvetica','normal');
-    doc.text(`Dacanal Engenharia  \u00b7  CREA-SP 5071835051  \u00b7  Laudo n\u00ba ${d.numLaudo}`, M, 285);
+    const artFooter = d.art ? `  \u00b7  ART N\u00ba ${d.art}` : '';
+    doc.text(`Dacanal Engenharia  \u00b7  CREA-SP 5071835051${artFooter}  \u00b7  Laudo n\u00ba ${d.numLaudo}`, M, 285);
     doc.text(`P\u00e1gina ${pageNum}`, W - M, 285, { align: 'right' });
     doc.setDrawColor(...borderGray);
     doc.setLineWidth(0.3); doc.line(M, 282, W-M, 282);
@@ -2242,7 +2248,8 @@ async function gerarPDF() {
   doc.text('Inspe\u00e7\u00e3o de Equipamentos de Playground', W/2, y, {align:'center'});
   y += 6;
   doc.setFontSize(9); doc.setTextColor(...muted);
-  doc.text('ABNT NBR 16071  \u00b7  ABNT NBR 14350  \u00b7  ART CREA-SP', W/2, y, {align:'center'});
+  const artLabel = d.art ? 'ART CREA-SP N\u00ba ' + d.art : 'ART CREA-SP';
+  doc.text('ABNT NBR 16071  \u00b7  ABNT NBR 14350  \u00b7  ' + artLabel, W/2, y, {align:'center'});
 
   // Badge nº laudo
   y += 10;
@@ -2309,6 +2316,7 @@ async function gerarPDF() {
   field('Tipo de Inspe\u00e7\u00e3o', d.tipo, M+contentW*2/3); y += 13;
   field('Tipo de Piso', d.piso, M);
   field('Condi\u00e7\u00e3o Clim\u00e1tica', d.clima, M + contentW/2 + 4); y += 13;
+  if (d.art) { field('N\u00ba da ART \u2014 CREA-SP', d.art, M); y += 13; }
 
   doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(...muted);
   doc.text('ENGENHEIRO RESPONS\u00c1VEL', M, y); y += 5;
